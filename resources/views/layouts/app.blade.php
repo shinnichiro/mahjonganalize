@@ -11,16 +11,28 @@
 	<title>解析</title>
 </head>
 <body>
-	<nav class="navbar navbar-expand-md navbar-dark bg-primary mb-4">
+	<nav class="navbar navbar-expand-md navbar-dark bg-info mb-4">
 		<a class="navbar-brand" href="#" >手動解析機</a>
 
 		<ul class="navbar-nav ml-auto">
-			<li class="nav-item">
-				<a class="nav-link" href="#">ログイン</a>
-			</li>
-			<li class="nav-item">
-				<a class="nav-link" href="#">登録</a>
-			</li>
+			@guest
+				<li class="nav-item">
+					{!! Form::open(["route" => "login", "method" => "get", "class" => "nav-link"]) !!}
+						{!! Form::submit("ログイン", ["class" => "btn btn-info"]) !!}
+					{!! Form::close() !!}
+				</li>
+				<li class="nav-item">
+					{!! Form::open(["route" => "register", "method" => "get", "class" => "nav-link"]) !!}
+						{!! Form::submit("登録", ["class" => "btn btn-info"]) !!}
+					{!! Form::close() !!}
+				</li>
+			@else
+				<li class="nav-item">
+					{!! Form::open(["route" => "logout", "method" => "post", "class" => "nav-link"]) !!}
+						{!! Form::submit("ログアウト", ["class" => "btn btn-info"]) !!}
+					{!! Form::close() !!}
+				</li>
+			@endguest
 		</ul>
 	</nav>
 

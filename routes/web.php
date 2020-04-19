@@ -14,6 +14,10 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get("/", "IndexController@index");
-Route::get("howto", "IndexController@howto");
+Route::get("howto", "IndexController@howto")->name("howto");
 
 Auth::routes();
+
+Route::get("statistics", function() {
+        return view("statistics");
+    });
