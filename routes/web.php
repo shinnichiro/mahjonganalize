@@ -16,4 +16,4 @@ use Illuminate\Support\Facades\Route;
 Route::get("/", "IndexController@index");
 Route::get("howto", "IndexController@howto");
 
-//Auth::routes();
+Auth::routes();
