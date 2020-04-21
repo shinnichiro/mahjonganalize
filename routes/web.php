@@ -21,3 +21,5 @@ Auth::routes();
 Route::get("statistics", function() {
         return view("statistics");
     });
+
+Route::resource("scores", "ScoresController");
