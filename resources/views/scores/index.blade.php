@@ -149,7 +149,7 @@ function scorebutton($i, $j) {
 
 	<div class="container">
 		<div class="row">
-			<div class="col-md-7">
+			<div class="col-md-8">
 				{!! Form::open(["route" => "scores.store"]) !!}
 <!--
 					<p class="mb-4">{!! Form::checkbox("dealer") !!} 親（未実装） {!! Form::checkbox("gained") !!} 得点 {!! Form::checkbox("tsumo") !!} ツモあがり（未実装）</p>
@@ -171,7 +171,7 @@ function scorebutton($i, $j) {
 					</table>
 				{!! Form::close() !!}
 			</div>
-			<div class="col-md-5">
+			<div class="col-md-4">
 					@foreach ($myscores as $myscore)
 						{!! Form::model($myscore, ["route" => ["scores.destroy", $myscore->id], "method" => "delete"]) !!}
 							<p><!--  <?php echo displayRound($myscore->turn); ?>--> {{ $myscore->score }}点		{!! Form::submit("削除", ["class" => "btn btn-danger"]) !!}</p>

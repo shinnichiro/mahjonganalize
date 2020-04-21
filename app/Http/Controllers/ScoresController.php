@@ -15,7 +15,7 @@ class ScoresController extends Controller
      */
     public function index()
     {
-        $myscores = Myscore::where("user_id", \Auth::user()->id)->orderBy("id", "desc")->paginate(15);
+        $myscores = Myscore::where("user_id", \Auth::user()->id)->orderBy("id", "desc")->paginate(10);
 
         return view("scores.index", [
             "myscores" => $myscores,
