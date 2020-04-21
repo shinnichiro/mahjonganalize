@@ -15,7 +15,7 @@ class ScoresController extends Controller
      */
     public function index()
     {
-        $myscores = Myscore::orderBy("id", "desc")->paginate(15);
+        $myscores = Myscore::where("user_id", \Auth::user()->id)->orderBy("id", "desc")->paginate(15);
 
         return view("scores.index", [
             "myscores" => $myscores,
@@ -75,7 +75,7 @@ class ScoresController extends Controller
      */
     public function edit($id)
     {
-        //
+        //使わない
     }
 
     /**
@@ -87,7 +87,7 @@ class ScoresController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        //使わない
     }
 
     /**

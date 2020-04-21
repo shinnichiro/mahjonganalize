@@ -28,6 +28,10 @@
 				</li>
 			@else
 				<li class="nav-item">
+					{!! Form::open(["route" => "statistics", "method" => "get", "class" => "nav-link"]) !!}
+						{!! Form::submit("統計ページ", ["class" => "btn btn-info"]) !!}
+					{!! Form::close() !!}
+				<li class="nav-item">
 					{!! Form::open(["route" => "logout", "method" => "post", "class" => "nav-link"]) !!}
 						{!! Form::submit("ログアウト", ["class" => "btn btn-info"]) !!}
 					{!! Form::close() !!}

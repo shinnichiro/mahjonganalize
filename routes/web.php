@@ -18,8 +18,12 @@ Route::get("howto", "IndexController@howto")->name("howto");
 
 Auth::routes();
 
+Route::get("statistics", "StatisticsController@statistics")->name("statistics");
+
+/*
 Route::get("statistics", function() {
         return view("statistics");
     });
+*/
 
 Route::resource("scores", "ScoresController");
