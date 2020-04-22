@@ -1,4 +1,7 @@
 <?php
+
+use App\Scores\ScoresOperation;
+
 function displayRound($t) {
     $turn = ($t - $t % 100) / 100;
     $strwind = "";
@@ -252,13 +255,32 @@ function dealerscorebutton($i, $j) {
     }
 }
 
-function displayPlayer($check, $player, $h_player, $score) {
-    if($check == $player) {
-        return $score;
-    } else if ($check == $h_player) {
-        return "<font color=\"red\">" . -$score . "</font>";
+function displayPlayer($check, $player, $h_player, $score, $turn, $dealer) {
+    $scoresoperation = new ScoresOperation();
+
+    if ($h_player != 4) {
+        if ($check == $player) {
+            return $score;
+        } else if ($check == $h_player) {
+            return "<font color=\"red\">" . -$score . "</font>";
+        } else {
+            return "";
+        }
     } else {
-        return "";
+        if ($check == $player) {
+            return $score;
+        } else {
+            if ($dealer == true) {
+                return "<font color=\"red\">" . -$score/3 . "</font>";
+            } else {
+                if ($check == (((int)($turn/100))%4)) {         //親の被ツモ
+                    $calcscore = $scoresoperation->showScore($score, true);
+                } else {                                        //子の被ツモ
+                    $calcscore = $scoresoperation->showScore($score, false);
+                }
+            }
+            return "<font color=\"red\">" . -$calcscore . "</font>";
+        }
     }
 }
 ?>
@@ -273,12 +295,14 @@ function displayPlayer($check, $player, $h_player, $score) {
  				{!! Form::open(["route" => "scores.store"]) !!}
 
 				@if ($dealer == true)
-					{!! Form::radio("dealer", "親", true) !!}{!! link_to_route("scores.index", "親", ["dealer" => false]) !!}
+					{!! Form::radio("dealer", "親", true) !!}{!! link_to_route("scores.index", "親", ["dealer" => false]) !!}　　
 				@else
-					{!! Form::radio("dealer", "子", true) !!}{!! link_to_route("scores.index", "子", ["dealer" => true]) !!}
+					{!! Form::radio("dealer", "子", true) !!}{!! link_to_route("scores.index", "子", ["dealer" => true]) !!}　　
 				@endif
 
-				<p>{!! Form::select("player", ["東", "南", "西", "北"]) !!} 家が {!! Form::select("houjuu_player", ["東", "南", "西", "北"]) !!} 家から和了</p>
+				{!! Form::checkbox("tsumo", true) !!} ツモあがり
+
+				<p>和了者{!! Form::select("player", ["東", "南", "西", "北"]) !!} 家 ／ 放銃者{!! Form::select("houjuu_player", ["東", "南", "西", "北"]) !!} 家</p>
 
 					<table class="table table-bordered">
 						<thead>
@@ -307,10 +331,10 @@ function displayPlayer($check, $player, $h_player, $score) {
 					<thead>
 						<tr>
 							<th>開始時</th>
-							<th>東家</th>
-							<th>南家</th>
-							<th>西家</th>
-							<th>北家</th>
+							<th>起家</th>
+							<th>B</th>
+							<th>C</th>
+							<th>D</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -318,7 +342,7 @@ function displayPlayer($check, $player, $h_player, $score) {
 						<tr>
 							<td><?php echo displayRound($myscore->turn); ?></td>
 							@for ($i=0; $i<4; $i++)
-							<td><?php echo displayPlayer($i, $myscore->player, $myscore->houjuu_player, $myscore->score); ?></td>
+							<td><?php echo displayPlayer($i, $myscore->player, $myscore->houjuu_player, $myscore->score, $myscore->turn, $myscore->dealer); ?></td>
 							@endfor
 						</tr>
 						@endforeach

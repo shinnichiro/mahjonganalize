@@ -10,6 +10,65 @@ class ScoresController extends Controller
 {
     public $dealer = false;
 
+    public function tsumoScore($score, $dealer){
+        switch ($score) {
+            case 1000:
+                return 1100;
+                break;
+            case 2000:
+                if ($dealer == true) {
+                    return 2100;
+                } else {
+                    return 2000;
+                }
+                break;
+            case 3900:
+                if ($dealer == true) {
+                    return 3900;
+                } else {
+                    return 4000;
+                }
+                break;
+            case 7700:
+                if ($dealer == true) {
+                    return 7800;
+                } else {
+                    return 7900;
+                }
+                break;
+            case 1300:
+                return 1500;
+                break;
+            case 2600:
+                return 2700;
+                break;
+            case 2300:
+                return 2400;
+                break;
+            case 4500:
+                return 4700;
+                break;
+            case 2900:
+                return 3000;
+                break;
+            case 5800:
+                return 6000;
+                break;
+            case 11600:
+                return 11700;
+                break;
+            case 3400:
+                return 3600;
+                break;
+            case 6800:
+                return 6900;
+                break;
+            default:
+                return $score;
+                break;
+        }
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -48,29 +107,48 @@ class ScoresController extends Controller
      */
     public function store(Request $request)
     {
-        if ($request->player == $request->houjuu_player) {
-            return redirect("scores");
-        }
-
+        //空ボタンを押したとき
         if ($request->score != NULL) {
-            $myscore = new Myscore;
+            //ツモ以外で和了者と放銃者が同じだったとき
+            if (($request->player != $request->houjuu_player) || ($request->tsumo == true)) {
+                //東家で子の点数を選ぶorその逆だったとき
+                if (!((($request->player == "0") && ($request->dealer == "子")) || (($request->player != "0") && ($request->dealer == "親")))) {
+                    $myscore = new Myscore;
 
-            if ($request->dealer == "親") {
-                $myscore->dealer = true;
-            } else {
-                $myscore->dealer = false;
+                    if ($request->dealer == "親") {
+                        $myscore->dealer = true;
+                    } else {
+                        $myscore->dealer = false;
+                    }
+
+                    //仮
+                    $myscore->turn = 100;
+
+                    $myscore->player = ((int)($request->player) + ((int)(($myscore->turn)/100))) % 4;
+                    if ($myscore->player == ((int)(($myscore->turn)/100)) % 4) {
+                        $myscore->iscored = true;
+                    } else {
+                        $myscore->iscored = false;
+                    }
+
+                    $myscore->score = (int)($request->score);
+                    if ($request->tsumo == true) {
+                        $myscore->tsumo = true;
+                        $myscore->houjuu_player = 4;
+                        //ツモあがり点数補正
+                        $myscore->score = $this->tsumoScore($myscore->score, $myscore->dealer);
+                    } else {
+                        $myscore->tsumo = false;
+                        $myscore->houjuu_player = ((int)($request->houjuu_player) + ((int)(($myscore->turn)/100))) % 4;
+                    }
+
+                    $myscore->user_id = \Auth::user()->id;
+                    $myscore->date = "2000-01-01";
+                    $myscore->gamesOfDay = 1;
+
+                    $myscore->save();
+                }
             }
-
-            $myscore->user_id = \Auth::user()->id;
-            $myscore->iscored = true;
-            $myscore->player = $request->player;
-            $myscore->houjuu_player = $request->houjuu_player;
-            $myscore->date = "2000-01-01";
-            $myscore->gamesOfDay = 1;
-            $myscore->turn = 0;
-            $myscore->score = (int)($request->score);
-            $myscore->tsumo = false;
-            $myscore->save();
         }
 
         return redirect("scores");
