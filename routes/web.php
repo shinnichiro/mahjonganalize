@@ -20,10 +20,6 @@ Auth::routes();
 
 Route::get("statistics", "StatisticsController@statistics")->name("statistics");
 
-/*
-Route::get("statistics", function() {
-        return view("statistics");
-    });
-*/
+Route::resource("info", "InfoController", ["only" => ["index", "store"]]);
 
 Route::resource("scores", "ScoresController");

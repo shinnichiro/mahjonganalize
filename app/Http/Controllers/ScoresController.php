@@ -79,6 +79,7 @@ class ScoresController extends Controller
         $myscores = Myscore::where("user_id", \Auth::user()->id)->orderBy("id", "desc")->paginate(10);
         $this->dealer = $request->dealer;
 
+
         if ($this->dealer == null) {
             $this->dealer = false;
         }
@@ -114,6 +115,15 @@ class ScoresController extends Controller
                 //東家で子の点数を選ぶorその逆だったとき
                 if (!((($request->player == "0") && ($request->dealer == "子")) || (($request->player != "0") && ($request->dealer == "親")))) {
                     $myscore = new Myscore;
+                    $compscore = Myscore::where("user_id", \Auth::id())->latest()->first();
+
+                    if ($compscore->score == 1) {
+                        $myscore = $compscore;
+                    } else {
+                        $myscore->start = $compscore->start;
+                        $myscore->gamesOfDay = $compscore->gamesOfDay;
+
+                    }
 
                     if ($request->dealer == "親") {
                         $myscore->dealer = true;
@@ -122,14 +132,10 @@ class ScoresController extends Controller
                     }
 
                     //仮
-                    $myscore->turn = 100;
+                    $myscore->turn = 0;
 
+                    //最初の席順でだれがあがったか判定
                     $myscore->player = ((int)($request->player) + ((int)(($myscore->turn)/100))) % 4;
-                    if ($myscore->player == ((int)(($myscore->turn)/100)) % 4) {
-                        $myscore->iscored = true;
-                    } else {
-                        $myscore->iscored = false;
-                    }
 
                     $myscore->score = (int)($request->score);
                     if ($request->tsumo == true) {
@@ -144,7 +150,6 @@ class ScoresController extends Controller
 
                     $myscore->user_id = \Auth::user()->id;
                     $myscore->date = "2000-01-01";
-                    $myscore->gamesOfDay = 1;
 
                     $myscore->save();
                 }

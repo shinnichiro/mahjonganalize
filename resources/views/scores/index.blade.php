@@ -340,6 +340,9 @@ function displayPlayer($check, $player, $h_player, $score, $turn, $dealer) {
 					<tbody>
 						@foreach ($myscores as $myscore)
 						<tr>
+							@if ($myscore->turn == 10000)
+								@continue
+							@endif
 							<td><?php echo displayRound($myscore->turn); ?></td>
 							@for ($i=0; $i<4; $i++)
 							<td><?php echo displayPlayer($i, $myscore->player, $myscore->houjuu_player, $myscore->score, $myscore->turn, $myscore->dealer); ?></td>
@@ -349,7 +352,7 @@ function displayPlayer($check, $player, $h_player, $score, $turn, $dealer) {
 					</tbody>
 				</table>
 
-				{{ $myscores->links('pagination::bootstrap-4') }}
+				{{ $myscores->links('pagination::bootstrap-4')}}
 			</div>
 		</div>
 	</div>

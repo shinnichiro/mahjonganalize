@@ -6,6 +6,6 @@
 
 	<p>平均得点：{{ $average }}点</p>
 
-	{!! link_to_route("scores.index", "入力ページへ（仮）") !!}
+	{!! link_to_route("info.index", "入力ページへ（仮）") !!}
 
 @endsection
