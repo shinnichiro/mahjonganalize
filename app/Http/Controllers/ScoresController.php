@@ -8,17 +8,25 @@ use App\Myscore;
 
 class ScoresController extends Controller
 {
+    public $dealer = false;
+
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         $myscores = Myscore::where("user_id", \Auth::user()->id)->orderBy("id", "desc")->paginate(10);
+        $this->dealer = $request->dealer;
+
+        if ($this->dealer == null) {
+            $this->dealer = false;
+        }
 
         return view("scores.index", [
             "myscores" => $myscores,
+            "dealer" => $this->dealer,
         ]);
     }
 
@@ -43,17 +51,24 @@ class ScoresController extends Controller
         if ($request->score != NULL) {
             $myscore = new Myscore;
 
+            if ($request->dealer == "親") {
+                $myscore->dealer = true;
+            } else {
+                $myscore->dealer = false;
+            }
+
             $myscore->user_id = \Auth::user()->id;
-            $myscore->player = true;
+            $myscore->iscored = true;
+            $myscore->player = 0;
             $myscore->date = "2000-01-01";
             $myscore->gamesOfDay = 1;
             $myscore->turn = 0;
             $myscore->score = (int)($request->score);
-            $myscore->dealer = false;
+            $myscore->tsumo = false;
             $myscore->save();
         }
 
-        return $this->index();
+        return redirect("scores");
     }
 
     /**
@@ -101,6 +116,6 @@ class ScoresController extends Controller
         $myscore = Myscore::find($id);
         $myscore->delete();
 
-        return $this->index();
+        return redirect("scores");
     }
 }

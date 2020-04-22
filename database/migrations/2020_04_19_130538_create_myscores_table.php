@@ -16,12 +16,14 @@ class CreateMyscoresTable extends Migration
         Schema::create('myscores', function (Blueprint $table) {
             $table->id();
             $table->biginteger("user_id")->unsigned();
-            $table->boolean("player");
+            $table->boolean("iscored");
+            $table->integer("player");
             $table->date("date");
             $table->integer("gamesOfDay");
             $table->integer("turn");
             $table->integer("score");
             $table->boolean("dealer");
+            $table->boolean("tsumo");
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users');

@@ -141,6 +141,134 @@ function scorebutton($i, $j) {
             break;
     }
 }
+
+function dealerscorebutton($i, $j) {
+    switch ($i) {
+        case 0:
+            switch ($j) {
+                case 0:
+                    return 1500;
+                    break;
+                case 1:
+                    return 2900;
+                    break;
+                case 2:
+                    return 5800;
+                    break;
+                case 3:
+                    return 11600;
+                    break;
+                case 4:
+                    return NULL;
+                    break;
+                case 5:
+                    return NULL;
+                    break;
+            }
+        case 1:
+            switch ($j) {
+                case 0:
+                    return 2000;
+                    break;
+                case 1:
+                    return 3900;
+                    break;
+                case 2:
+                    return 7700;
+                    break;
+                case 3:
+                    return NULL;
+                    break;
+                case 4:
+                    return NULL;
+                    break;
+                case 5:
+                    return NULL;
+                    break;
+            }
+        case 2:
+            switch ($j) {
+                case 0:
+                    return 2400;
+                    break;
+                case 1:
+                    return 4800;
+                    break;
+                case 2:
+                    return 9600;
+                    break;
+                case 3:
+                    return NULL;
+                    break;
+                case 4:
+                    return NULL;
+                    break;
+                case 5:
+                    return NULL;
+                    break;
+            }
+        case 3:
+            switch ($j) {
+                case 0:
+                    return 3400;
+                    break;
+                case 1:
+                    return 6800;
+                    break;
+                case 2:
+                    return NULL;
+                    break;
+                case 3:
+                    return NULL;
+                    break;
+                case 4:
+                    return NULL;
+                    break;
+                case 5:
+                    return NULL;
+                    break;
+            }
+        case 4:
+            switch ($j) {
+                case 0:
+                    return 12000;
+                    break;
+                case 1:
+                    return 18000;
+                    break;
+                case 2:
+                    return 24000;
+                    break;
+                case 3:
+                    return 36000;
+                    break;
+                default :
+                    return NULL;
+                    break;
+            }
+        case 5:
+            switch ($j) {
+                case 0:
+                    return 48000;
+                    break;
+                case 1:
+                    return 96000;
+                    break;
+                case 2:
+                    return 144000;
+                    break;
+                case 3:
+                    return 192000;
+                    break;
+                default :
+                    return NULL;
+                    break;
+            }
+        default:
+            return 0;
+            break;
+    }
+}
 ?>
 
 @extends("layouts.app")
@@ -150,10 +278,14 @@ function scorebutton($i, $j) {
 	<div class="container">
 		<div class="row">
 			<div class="col-md-8">
-				{!! Form::open(["route" => "scores.store"]) !!}
-<!--
-					<p class="mb-4">{!! Form::checkbox("dealer") !!} 親（未実装） {!! Form::checkbox("gained") !!} 得点 {!! Form::checkbox("tsumo") !!} ツモあがり（未実装）</p>
--->
+ 				{!! Form::open(["route" => "scores.store"]) !!}
+
+				@if ($dealer == true)
+					{!! Form::radio("dealer", "親", true) !!}{!! link_to_route("scores.index", "親", ["dealer" => false]) !!}
+				@else
+					{!! Form::radio("dealer", "子", true) !!}{!! link_to_route("scores.index", "子", ["dealer" => true]) !!}
+				@endif
+
 					<table class="table table-bordered">
 						<thead>
 						</thead>
@@ -162,11 +294,16 @@ function scorebutton($i, $j) {
 								<tr>
 									@for ($j=0; $j<6; $j++)
 										<td>
-											<input type="submit" name="score" value="<?php echo scorebutton($i, $j); ?>">
+											@if ($dealer == false)
+												<input type="submit" name="score" value="<?php echo scorebutton($i, $j); ?>">
+											@else
+												<input type="submit" name="score" value="<?php echo dealerscorebutton($i, $j); ?>">
+											@endif
 										</td>
 									@endfor
 								</tr>
 							@endfor
+
 						</tbody>
 					</table>
 				{!! Form::close() !!}
