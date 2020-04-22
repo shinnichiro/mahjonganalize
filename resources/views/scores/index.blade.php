@@ -19,87 +19,67 @@ function scorebutton($i, $j) {
         case 0:
             switch ($j) {
                 case 0:
-                    return 300;
-                    break;
-                case 1:
-                    return 500;
-                    break;
-                case 2:
                     return 1000;
                     break;
-                case 3:
+                case 1:
                     return 2000;
                     break;
-                case 4:
+                case 2:
                     return 3900;
                     break;
-                case 5:
+                case 3:
                     return 7700;
                     break;
+                default:
+                    return NULL;
+                    break;
             }
+            break;
         case 1:
             switch ($j) {
                 case 0:
-                    return 400;
-                    break;
-                case 1:
-                    return 700;
-                    break;
-                case 2:
                     return 1300;
                     break;
-                case 3:
+                case 1:
                     return 2600;
                     break;
-                case 4:
+                case 2:
                     return 5200;
                     break;
-                case 5:
+                default:
                     return NULL;
                     break;
             }
+            break;
         case 2:
             switch ($j) {
                 case 0:
-                    return 400;
-                    break;
-                case 1:
-                    return 800;
-                    break;
-                case 2:
                     return 1600;
                     break;
-                case 3:
+                case 1:
                     return 3200;
                     break;
-                case 4:
+                case 2:
                     return 6400;
                     break;
-                case 5:
+                default:
                     return NULL;
                     break;
             }
+            break;
         case 3:
             switch ($j) {
                 case 0:
-                    return 600;
-                    break;
-                case 1:
-                    return 1200;
-                    break;
-                case 2:
                     return 2300;
                     break;
-                case 3:
+                case 1:
                     return 4500;
                     break;
-                case 4:
-                    return NULL;
-                    break;
-                case 5:
+                default:
                     return NULL;
                     break;
             }
+            break;
         case 4:
             switch ($j) {
                 case 0:
@@ -118,6 +98,7 @@ function scorebutton($i, $j) {
                     return NULL;
                     break;
             }
+            break;
         case 5:
             switch ($j) {
                 case 0:
@@ -136,6 +117,7 @@ function scorebutton($i, $j) {
                     return NULL;
                     break;
             }
+            break;
         default:
             return 0;
             break;
@@ -269,6 +251,16 @@ function dealerscorebutton($i, $j) {
             break;
     }
 }
+
+function displayPlayer($check, $player, $h_player, $score) {
+    if($check == $player) {
+        return $score;
+    } else if ($check == $h_player) {
+        return "<font color=\"red\">" . -$score . "</font>";
+    } else {
+        return "";
+    }
+}
 ?>
 
 @extends("layouts.app")
@@ -277,7 +269,7 @@ function dealerscorebutton($i, $j) {
 
 	<div class="container">
 		<div class="row">
-			<div class="col-md-8">
+			<div class="col-md-7">
  				{!! Form::open(["route" => "scores.store"]) !!}
 
 				@if ($dealer == true)
@@ -286,13 +278,15 @@ function dealerscorebutton($i, $j) {
 					{!! Form::radio("dealer", "子", true) !!}{!! link_to_route("scores.index", "子", ["dealer" => true]) !!}
 				@endif
 
+				<p>{!! Form::select("player", ["東", "南", "西", "北"]) !!} 家が {!! Form::select("houjuu_player", ["東", "南", "西", "北"]) !!} 家から和了</p>
+
 					<table class="table table-bordered">
 						<thead>
 						</thead>
 						<tbody>
 							@for ($i=0; $i<6; $i++)
 								<tr>
-									@for ($j=0; $j<6; $j++)
+									@for ($j=0; $j<4; $j++)
 										<td>
 											@if ($dealer == false)
 												<input type="submit" name="score" value="<?php echo scorebutton($i, $j); ?>">
@@ -308,14 +302,30 @@ function dealerscorebutton($i, $j) {
 					</table>
 				{!! Form::close() !!}
 			</div>
-			<div class="col-md-4">
-					@foreach ($myscores as $myscore)
-						{!! Form::model($myscore, ["route" => ["scores.destroy", $myscore->id], "method" => "delete"]) !!}
-							<p><!--  <?php echo displayRound($myscore->turn); ?>--> {{ $myscore->score }}点		{!! Form::submit("削除", ["class" => "btn btn-danger"]) !!}</p>
-						{!! Form::close() !!}
-					@endforeach
+			<div class="col-md-5">
+				<table class="table table-bordered table-striped">
+					<thead>
+						<tr>
+							<th>開始時</th>
+							<th>東家</th>
+							<th>南家</th>
+							<th>西家</th>
+							<th>北家</th>
+						</tr>
+					</thead>
+					<tbody>
+						@foreach ($myscores as $myscore)
+						<tr>
+							<td><?php echo displayRound($myscore->turn); ?></td>
+							@for ($i=0; $i<4; $i++)
+							<td><?php echo displayPlayer($i, $myscore->player, $myscore->houjuu_player, $myscore->score); ?></td>
+							@endfor
+						</tr>
+						@endforeach
+					</tbody>
+				</table>
 
-					{{ $myscores->links('pagination::bootstrap-4') }}
+				{{ $myscores->links('pagination::bootstrap-4') }}
 			</div>
 		</div>
 	</div>

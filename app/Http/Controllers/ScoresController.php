@@ -48,6 +48,10 @@ class ScoresController extends Controller
      */
     public function store(Request $request)
     {
+        if ($request->player == $request->houjuu_player) {
+            return redirect("scores");
+        }
+
         if ($request->score != NULL) {
             $myscore = new Myscore;
 
@@ -59,7 +63,8 @@ class ScoresController extends Controller
 
             $myscore->user_id = \Auth::user()->id;
             $myscore->iscored = true;
-            $myscore->player = 0;
+            $myscore->player = $request->player;
+            $myscore->houjuu_player = $request->houjuu_player;
             $myscore->date = "2000-01-01";
             $myscore->gamesOfDay = 1;
             $myscore->turn = 0;

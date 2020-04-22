@@ -18,6 +18,7 @@ class CreateMyscoresTable extends Migration
             $table->biginteger("user_id")->unsigned();
             $table->boolean("iscored");
             $table->integer("player");
+            $table->integer("houjuu_player");
             $table->date("date");
             $table->integer("gamesOfDay");
             $table->integer("turn");
