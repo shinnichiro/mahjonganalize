@@ -9,11 +9,12 @@ use App\Myscore;
 class StatisticsController extends Controller
 {
     private $sum = 0;
-    private $datas = 0;
+    private $iscored = 0;
+    private $allscored = 0;
 
     private function add($n) {
         $this->sum += $n;
-        $this->datas++;
+        $this->iscored++;
     }
 
     public function statistics() {
@@ -23,19 +24,37 @@ class StatisticsController extends Controller
             $latestscore->delete();
         }
 
-        $myscores = Myscore::where("user_id", \Auth::id())->get();
+        $basicscores = Myscore::where("user_id", \Auth::id());
+        $allscores = $basicscores->get();
+        $myscores = Myscore::where("user_id", \Auth::id())->whereColumn("start","player")->get();
+        $houjuuscores = Myscore::where("user_id", \Auth::id())->whereColumn("start", "houjuu_player")->get();
+
+        foreach ($allscores as $allscore) {
+            $this->allscored++;
+        }
 
         foreach ($myscores as $myscore) {
             $this->add($myscore->score);
         }
 
-        if ($this->datas == 0){
-            $this->datas++;
+        //0で割る対策
+        if ($this->iscored == 0){
+            $this->iscored = 1;
+        }
+        if ($this->allscored == 0) {
+            $this->allscored = 1;
+        }
+        if ($houjuuscores->count() == 0) {
+            $houjuu = 1;
+        } else {
+            $houjuu = $houjuuscores->count();
         }
 
         return view("statistics", [
-            "sum" => $this->sum,
-            "average" => $this->sum/$this->datas,
+            "average" => $this->sum/$this->iscored,
+            "agaripro" => ($this->iscored/$this->allscored)*100,
+            "averagehoujuu" => $houjuuscores->sum("score")/$houjuu,
+            "houjuupro" => ($houjuuscores->count()/$this->allscored)*100,
         ]);
     }
 }

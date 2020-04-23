@@ -78,15 +78,14 @@ class ScoresController extends Controller
     {
         $latestscore = Myscore::where("user_id", \Auth::id())->latest()->first();
 
-        $myscores = Myscore::where("user_id",\Auth::user()->id);
-        $myscores = Myscore::where("gamesOfDay", $latestscore->gamesOfDay)->orderBy("id", "desc")->paginate(10);
+        $myscores = Myscore::where("user_id",\Auth::user()->id)->where("date", $latestscore->date)->where("gamesOfDay", $latestscore->gamesOfDay)->orderBy("id", "desc")->paginate(10);
         $this->dealer = $request->dealer;
         if ($this->dealer == null) {
             $this->dealer = false;
         }
 
-        //初期値(10000)or東１局で-を押した
-        if (($latestscore->turn == 10000) || ($request->turn < 0)) {
+        //東１局で-を押した
+        if ($request->turn < 0) {
             $turn = 0;
         //実装は西４局まで
         } else if ($request->turn > 1100) {
@@ -95,7 +94,7 @@ class ScoresController extends Controller
         } else if ($request->turn % 100 == 99) {
             $turn = $request->turn + 1;
         } else if ($request->turn == NULL) {
-            $turn = $latestscore->turn;
+            $turn = 0;
         } else {
             $turn = $request->turn;
         }
@@ -126,6 +125,7 @@ class ScoresController extends Controller
     public function store(Request $request)
     {
         $turn = -1;
+        $flag = 0;
 
         //空ボタンを押したとき
         if ($request->score != NULL) {
@@ -136,11 +136,24 @@ class ScoresController extends Controller
                     $myscore = new Myscore;
                     $compscore = Myscore::where("user_id", \Auth::id())->latest()->first();
 
+                    $myscore->date = date("Y-m-d");
+
+                    //初期値判定
                     if ($compscore->score == 1) {
                         $myscore = $compscore;
                     } else {
                         $myscore->start = $compscore->start;
                         $myscore->gamesOfDay = $compscore->gamesOfDay;
+                    }
+
+                    //すでに入力済みの局だったとき
+                    $inputedscores = Myscore::where("user_id", \Auth::id())->where("date", $myscore->date)->where("gamesOfDay", $myscore->gamesOfDay)->get();
+                    foreach($inputedscores as $inputedscore) {
+                        if ($inputedscore->turn == $request->turn) {
+                            return redirect()->route("scores.index", [
+                                "turn" => $request->turn,
+                            ]);
+                        }
                     }
 
                     if ($request->dealer == "true") {
@@ -166,7 +179,6 @@ class ScoresController extends Controller
                     }
 
                     $myscore->user_id = \Auth::user()->id;
-                    $myscore->date = "2000-01-01";
 
                     $myscore->save();
 

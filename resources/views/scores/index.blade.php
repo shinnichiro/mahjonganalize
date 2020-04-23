@@ -312,9 +312,9 @@ function displayPlayer($check, $player, $h_player, $score, $turn, $dealer) {
 					<div class="col-md-5">
 						<div>
 						@if ($dealer == true)
-							<input type="hidden" name="dealer" value="true">{{ link_to_route("scores.index", "親", ["dealer" => false, "turn" => $turn]) }}　　
+							<input type="hidden" name="dealer" value="true">{{ link_to_route("scores.index", "親", ["dealer" => false, "turn" => $turn], ["class" => "btn btn-light"]) }}　　
 						@else
-							<input type="hidden" name="dealer" value="false">{{ link_to_route("scores.index", "子", ["dealer" => true, "turn" => $turn]) }}　　
+							<input type="hidden" name="dealer" value="false">{{ link_to_route("scores.index", "子", ["dealer" => true, "turn" => $turn], ["class" => "btn btn-light"]) }}　　
 						@endif
 
 						{!! Form::checkbox("tsumo", true) !!}ツモあがり
@@ -351,7 +351,7 @@ function displayPlayer($check, $player, $h_player, $score, $turn, $dealer) {
 
 				<div class="d-flex justify-content-end">
 					{{ link_to_route("info.index", "続けて入力", [], ["class" => "btn btn-primary"]) }}　
-					{{ link_to_route("statistics", "統計ページへ戻る", [], ["class" => "btn btn-success"]) }}
+					{{ link_to_route("statistics", "統計ページへ", [], ["class" => "btn btn-success"]) }}
 				</div>
 
 			</div>
