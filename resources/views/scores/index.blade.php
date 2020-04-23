@@ -14,7 +14,7 @@ function displayRound($t) {
         $strwind = "西";
     }
 
-    return $strwind . (($turn%4)+1) .  "局" . ($t % 4) . "本場";
+    return $strwind . (($turn%4)+1) .  "局 " . ($t % 100) . "本場";
 }
 
 function scorebutton($i, $j) {
@@ -291,42 +291,72 @@ function displayPlayer($check, $player, $h_player, $score, $turn, $dealer) {
 
 	<div class="container">
 		<div class="row">
-			<div class="col-md-7">
- 				{!! Form::open(["route" => "scores.store"]) !!}
+			<div class="col-md-6">
+ 				{{ Form::open(["route" => "scores.store"]) }}
 
-				@if ($dealer == true)
-					{!! Form::radio("dealer", "親", true) !!}{!! link_to_route("scores.index", "親", ["dealer" => false]) !!}　　
-				@else
-					{!! Form::radio("dealer", "子", true) !!}{!! link_to_route("scores.index", "子", ["dealer" => true]) !!}　　
-				@endif
+				<div class="row mb-3">
+					<div class="col-md-6">
+					 	<input class="form-control" type="text" value="{{ displayRound($turn) }}" readonly>
+					</div>
+					<div class="col-md-6 d-inline-flex">
+						<div class="align-middle">
+ 						{{ link_to_route("scores.index", "ー", ["turn" => (((int)($turn/100)-1)*100)], ["class" => "btn btn-light"]) }} 局 {{ link_to_route("scores.index", "＋", ["turn" => (((int)($turn/100)+1)*100)], ["class" => "btn btn-light"]) }}
+ 						{{ link_to_route("scores.index", "ー", ["turn" => $turn-1], ["class" => "btn btn-light"]) }} 本場 {{ link_to_route("scores.index", "＋", ["turn" => $turn+1], ["class" => "btn btn-light"]) }}
+ 						</div>
+					</div>
+				</div>
 
-				{!! Form::checkbox("tsumo", true) !!} ツモあがり
+				<input type="hidden" name="turn" value="{{ $turn }}">
 
-				<p>和了者{!! Form::select("player", ["東", "南", "西", "北"]) !!} 家 ／ 放銃者{!! Form::select("houjuu_player", ["東", "南", "西", "北"]) !!} 家</p>
+				<div class="row mb-3">
+					<div class="col-md-5">
+						<div>
+						@if ($dealer == true)
+							<input type="hidden" name="dealer" value="true">{{ link_to_route("scores.index", "親", ["dealer" => false, "turn" => $turn]) }}　　
+						@else
+							<input type="hidden" name="dealer" value="false">{{ link_to_route("scores.index", "子", ["dealer" => true, "turn" => $turn]) }}　　
+						@endif
 
-					<table class="table table-bordered">
-						<thead>
-						</thead>
-						<tbody>
-							@for ($i=0; $i<6; $i++)
-								<tr>
-									@for ($j=0; $j<4; $j++)
-										<td>
-											@if ($dealer == false)
-												<input type="submit" name="score" value="<?php echo scorebutton($i, $j); ?>">
-											@else
-												<input type="submit" name="score" value="<?php echo dealerscorebutton($i, $j); ?>">
-											@endif
-										</td>
-									@endfor
-								</tr>
-							@endfor
+						{!! Form::checkbox("tsumo", true) !!}ツモあがり
+						</div>
+					</div>
 
-						</tbody>
-					</table>
-				{!! Form::close() !!}
+					<div class="col-md-7">
+						和了者{{ Form::select("player", ["東", "南", "西", "北"]) }} 家 ／ 放銃者{{ Form::select("houjuu_player", ["東", "南", "西", "北"]) }} 家
+					</div>
+				</div>
+
+				<table class="table table-bordered mb-4">
+					<thead>
+					</thead>
+					<tbody>
+						@for ($i=0; $i<6; $i++)
+							<tr>
+								@for ($j=0; $j<4; $j++)
+									<td>
+										@if ($dealer == false)
+											<input type="submit" name="score" value="{{ scorebutton($i, $j) }}">
+										@else
+											<input type="submit" name="score" value="{{ dealerscorebutton($i, $j) }}">
+										@endif
+									</td>
+								@endfor
+							</tr>
+						@endfor
+
+					</tbody>
+				</table>
+
+				{{ Form::close() }}
+
+				<div class="d-flex justify-content-end">
+					{{ link_to_route("info.index", "続けて入力", [], ["class" => "btn btn-primary"]) }}　
+					{{ link_to_route("statistics", "統計ページへ戻る", [], ["class" => "btn btn-success"]) }}
+				</div>
+
 			</div>
-			<div class="col-md-5">
+
+			<div class="col-md-6">
 				<table class="table table-bordered table-striped">
 					<thead>
 						<tr>
@@ -343,10 +373,15 @@ function displayPlayer($check, $player, $h_player, $score, $turn, $dealer) {
 							@if ($myscore->turn == 10000)
 								@continue
 							@endif
-							<td><?php echo displayRound($myscore->turn); ?></td>
+							<td class="align-middle">{{ displayRound($myscore->turn) }}</td>
 							@for ($i=0; $i<4; $i++)
-							<td><?php echo displayPlayer($i, $myscore->player, $myscore->houjuu_player, $myscore->score, $myscore->turn, $myscore->dealer); ?></td>
+							<td class="align-middle">{!! displayPlayer($i, $myscore->player, $myscore->houjuu_player, $myscore->score, $myscore->turn, $myscore->dealer) !!}</td>
 							@endfor
+							<td>
+							{{ Form::model($myscore, ["route" => ["scores.destroy", $myscore->id], "method" => "delete"]) }}
+								{{ Form::submit("削除", ["class" => "btn btn-danger"]) }}
+							{{ Form::close() }}
+							</td>
 						</tr>
 						@endforeach
 					</tbody>

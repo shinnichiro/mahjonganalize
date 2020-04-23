@@ -17,6 +17,12 @@ class StatisticsController extends Controller
     }
 
     public function statistics() {
+        //空データ対策
+        $latestscore = Myscore::where("user_id", \Auth::id())->latest()->first();
+        if ($latestscore->score == 1) {
+            $latestscore->delete();
+        }
+
         $myscores = Myscore::where("user_id", \Auth::id())->get();
 
         foreach ($myscores as $myscore) {

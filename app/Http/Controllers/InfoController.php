@@ -30,6 +30,11 @@ class InfoController extends Controller
         $myscore->tsumo = false;
         $myscore->save();
 
+        //空データ対策
+        if ($compscore->score = 1) {
+            $compscore->delete();
+        }
+
         return redirect("scores");
     }
 }

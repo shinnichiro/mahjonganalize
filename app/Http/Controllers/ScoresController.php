@@ -76,17 +76,34 @@ class ScoresController extends Controller
      */
     public function index(Request $request)
     {
-        $myscores = Myscore::where("user_id", \Auth::user()->id)->orderBy("id", "desc")->paginate(10);
+        $latestscore = Myscore::where("user_id", \Auth::id())->latest()->first();
+
+        $myscores = Myscore::where("user_id",\Auth::user()->id);
+        $myscores = Myscore::where("gamesOfDay", $latestscore->gamesOfDay)->orderBy("id", "desc")->paginate(10);
         $this->dealer = $request->dealer;
-
-
         if ($this->dealer == null) {
             $this->dealer = false;
+        }
+
+        //初期値(10000)or東１局で-を押した
+        if (($latestscore->turn == 10000) || ($request->turn < 0)) {
+            $turn = 0;
+        //実装は西４局まで
+        } else if ($request->turn > 1100) {
+            $turn = 1100 + ($request->turn)%100;
+        //0本場で-を押した
+        } else if ($request->turn % 100 == 99) {
+            $turn = $request->turn + 1;
+        } else if ($request->turn == NULL) {
+            $turn = $latestscore->turn;
+        } else {
+            $turn = $request->turn;
         }
 
         return view("scores.index", [
             "myscores" => $myscores,
             "dealer" => $this->dealer,
+            "turn" => $turn,
         ]);
     }
 
@@ -108,12 +125,14 @@ class ScoresController extends Controller
      */
     public function store(Request $request)
     {
+        $turn = -1;
+
         //空ボタンを押したとき
         if ($request->score != NULL) {
             //ツモ以外で和了者と放銃者が同じだったとき
             if (($request->player != $request->houjuu_player) || ($request->tsumo == true)) {
                 //東家で子の点数を選ぶorその逆だったとき
-                if (!((($request->player == "0") && ($request->dealer == "子")) || (($request->player != "0") && ($request->dealer == "親")))) {
+                if (!((($request->player == "0") && ($request->dealer == "false")) || (($request->player != "0") && ($request->dealer == "true")))) {
                     $myscore = new Myscore;
                     $compscore = Myscore::where("user_id", \Auth::id())->latest()->first();
 
@@ -122,17 +141,15 @@ class ScoresController extends Controller
                     } else {
                         $myscore->start = $compscore->start;
                         $myscore->gamesOfDay = $compscore->gamesOfDay;
-
                     }
 
-                    if ($request->dealer == "親") {
+                    if ($request->dealer == "true") {
                         $myscore->dealer = true;
                     } else {
                         $myscore->dealer = false;
                     }
 
-                    //仮
-                    $myscore->turn = 0;
+                    $myscore->turn = (int)($request->turn);
 
                     //最初の席順でだれがあがったか判定
                     $myscore->player = ((int)($request->player) + ((int)(($myscore->turn)/100))) % 4;
@@ -152,11 +169,23 @@ class ScoresController extends Controller
                     $myscore->date = "2000-01-01";
 
                     $myscore->save();
+
+                    if ($myscore->dealer == true) {
+                        $turn = $myscore->turn + 1;
+                    } else {
+                        $turn = ((int)($myscore->turn/100)+1) * 100;
+                    }
                 }
             }
         }
 
-        return redirect("scores");
+        if ($turn == -1) {
+            $turn = $request->turn;
+        }
+
+        return redirect()->route("scores.index", [
+            "turn" => $turn,
+        ]);
     }
 
     /**
