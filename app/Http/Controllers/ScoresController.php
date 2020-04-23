@@ -192,7 +192,7 @@ class ScoresController extends Controller
                     $myscore->user_id = \Auth::user()->id;
 
                     //流局時の処理
-                    if ($tenpaicount != 0) {
+                    if ($flag == 1) {
                         $myscore->player = 4;
                         $myscore->houjuu_player = 5 + $tenpaicount;
                         $myscore->score = 0;

@@ -347,7 +347,7 @@ function displayPlayer($check, $player, $h_player, $score, $turn, $dealer) {
 
     //流局
     if ($h_player > 4) {
-        //聴牌者の人数
+        //聴牌者の数
         for ($i=0; $i<4; $i++) {
             if ($tenpai[$i] == true) {
                 $counttenpai++;
