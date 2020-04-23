@@ -32,7 +32,7 @@ class InfoController extends Controller
         }
 
         $myscore->player = 5;
-        $myscore->houjuu_player = 5;
+        $myscore->houjuu_player = 99;
         $myscore->date = date("Y-m-d");
         $myscore->turn = 10000;
         $myscore->score = 1;

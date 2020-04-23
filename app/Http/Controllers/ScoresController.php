@@ -125,14 +125,25 @@ class ScoresController extends Controller
     public function store(Request $request)
     {
         $turn = -1;
+        $tenpaicount = 0;
         $flag = 0;
 
+        //流局時（
+        if ($request->ryuukyoku == "流局") {
+            $flag = 1;
+            for ($i=0; $i<4; $i++) {
+                if ($request->$i != NULL) {
+                    $tenpaicount += (int)($request->$i);
+                }
+            }
+        }
+
         //空ボタンを押したとき
-        if ($request->score != NULL) {
+        if (($request->score != NULL) || ($flag == 1)) {
             //ツモ以外で和了者と放銃者が同じだったとき
-            if (($request->player != $request->houjuu_player) || ($request->tsumo == true)) {
+            if ((($request->player != $request->houjuu_player) || ($request->tsumo == true)) || ($flag == 1)) {
                 //東家で子の点数を選ぶorその逆だったとき
-                if (!((($request->player == "0") && ($request->dealer == "false")) || (($request->player != "0") && ($request->dealer == "true")))) {
+                if ((!((($request->player == "0") && ($request->dealer == "false")) || (($request->player != "0") && ($request->dealer == "true")))) || ($flag == 1)) {
                     $myscore = new Myscore;
                     $compscore = Myscore::where("user_id", \Auth::id())->latest()->first();
 
@@ -179,6 +190,20 @@ class ScoresController extends Controller
                     }
 
                     $myscore->user_id = \Auth::user()->id;
+
+                    //流局時の処理
+                    if ($tenpaicount != 0) {
+                        $myscore->player = 4;
+                        $myscore->houjuu_player = 5 + $tenpaicount;
+                        $myscore->score = 0;
+                        $myscore->tsumo = false;
+                        $num = 0;
+                        if (($request->$num) != NULL) {
+                            $myscore->dealer = true;
+                        } else {
+                            $myscore->dealer = false;
+                        }
+                    }
 
                     $myscore->save();
 

@@ -255,10 +255,132 @@ function dealerscorebutton($i, $j) {
     }
 }
 
+function genten($score) {
+    return "<font color=\"red\">" . -$score . "</font>";
+}
+
 function displayPlayer($check, $player, $h_player, $score, $turn, $dealer) {
     $scoresoperation = new ScoresOperation();
+    $counttenpai = 0;
+    $tenpai = array();
 
-    if ($h_player != 4) {
+    for ($i=0; $i<4; $i++){
+        $tenpai[$i] = false;
+    }
+
+    //聴牌分岐
+    if ($h_player-5 >= 8) {
+        $tenpai[3] = true;
+        if ($h_player-5-8 >= 4){
+            $tenpai[2] = true;
+            if ($h_player-5-8-4 >= 2) {
+                $tenpai[1] = true;
+                if ($h_player-5-8-4-2 == 1) {
+                    $tenpai[0] = true;
+                } else {
+                    $tenpai[0] = false;
+                }
+            } else {
+                $tenpai[1] = false;
+                if ($h_player-5-8-4 == 1) {
+                    $tenpai[0] = true;
+                } else {
+                    $tenpai[0] = false;
+                }
+            }
+        } else {
+            $tenpai[2] = false;
+            if ($h_player-5-8 >= 2) {
+                $tenpai[1] = true;
+                if ($h_player-5-8-2 == 1) {
+                    $tenpai[0] = true;
+                } else {
+                    $tenpai[0] = false;
+                }
+            } else {
+                $tenpai[1] = false;
+                if ($h_player-5-8 == 1) {
+                    $tenpai[0] = true;
+                } else {
+                    $tenpai[0] = false;
+                }
+            }
+        }
+    } else {
+        $tenpai[3] = false;
+        if ($h_player-5 >= 4){
+            $tenpai[2] = true;
+            if ($h_player-5-4 >= 2) {
+                $tenpai[1] = true;
+                if ($h_player-5-4-2 == 1) {
+                    $tenpai[0] = true;
+                } else {
+                    $tenpai[0] = false;
+                }
+            } else {
+                $tenpai[1] = false;
+                if ($h_player-5-4 == 1) {
+                    $tenpai[0] = true;
+                } else {
+                    $tenpai[0] = false;
+                }
+            }
+        } else {
+            $tenpai[2] = false;
+            if ($h_player-5 >= 2) {
+                $tenpai[1] = true;
+                if ($h_player-5-2 == 1) {
+                    $tenpai[0] = true;
+                } else {
+                    $tenpai[0] = false;
+                }
+            } else {
+                $tenpai[1] = false;
+                if ($h_player-5 == 1) {
+                    $tenpai[0] = true;
+                } else {
+                    $tenpai[0] = false;
+                }
+            }
+        }
+    }
+
+    //流局
+    if ($h_player > 4) {
+        //聴牌者の人数
+        for ($i=0; $i<4; $i++) {
+            if ($tenpai[$i] == true) {
+                $counttenpai++;
+            }
+        }
+
+        for ($i=0; $i<4; $i++) {
+            if ($check == (((int)($turn/100)%4)+$i)%4){
+                if ($tenpai[$i] == true) {
+                    if ($counttenpai == 4) {
+                        return 0;
+                    } else if ($counttenpai == 3) {
+                        return 1000;
+                    } else if ($counttenpai == 2) {
+                        return 1500;
+                    } else if ($counttenpai == 1) {
+                        return 3000;
+                    }
+                } else {
+                    if ($counttenpai == 3) {
+                        return genten(3000);
+                    } else if ($counttenpai == 2) {
+                        return genten(1500);
+                    } else if ($counttenpai == 1) {
+                        return genten(1000);
+                    } else if ($counttenpai == 0) {
+                        return 0;
+                    }
+                }
+            }
+        }
+    //ロンあがり
+    } else if ($h_player != 4) {
         if ($check == $player) {
             return $score;
         } else if ($check == $h_player) {
@@ -266,6 +388,7 @@ function displayPlayer($check, $player, $h_player, $score, $turn, $dealer) {
         } else {
             return "";
         }
+    //ツモあがり
     } else {
         if ($check == $player) {
             return $score;
@@ -346,6 +469,17 @@ function displayPlayer($check, $player, $h_player, $score, $turn, $dealer) {
 
 					</tbody>
 				</table>
+
+				<div class="mb-2">
+					流局　　聴牌者　
+					{{ Form::checkbox("0", 1) }}東　
+					{{ Form::checkbox("1", 2) }}南　
+					{{ Form::checkbox("2", 4) }}西　
+					{{ Form::checkbox("3", 8) }}北
+					<div class="d-flex justify-content-end">
+						{{ Form::submit("流局", ["name" => "ryuukyoku", "class" => "btn btn-secondary"]) }}
+					</div>　
+				</div>
 
 				{{ Form::close() }}
 
