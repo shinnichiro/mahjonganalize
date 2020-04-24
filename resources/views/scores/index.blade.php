@@ -323,13 +323,17 @@ function displayPlayer($check, $player, $h_player, $score, $turn, $dealer) {
 							<input type="hidden" name="dealer" value="false">{{ link_to_route("scores.index", "子", ["dealer" => true, "turn" => $turn], ["class" => "btn btn-light"]) }}　　
 						@endif
 
-						{!! Form::checkbox("tsumo", true) !!}ツモあがり
+						{{ Form::checkbox("tsumo", true) }}ツモあがり
 						</div>
 					</div>
 
 					<div class="col-md-7">
 						和了者{{ Form::select("player", ["東", "南", "西", "北"]) }} 家 ／ 放銃者{{ Form::select("houjuu_player", ["東", "南", "西", "北"]) }} 家
 					</div>
+				</div>
+
+				<div class="mb-3">
+					リーチ者　{{ Form::checkbox("reachton", true) }}東　{{ Form::checkbox("reachnan", true) }}南　{{ Form::checkbox("reachsha", true) }}西　{{ Form::checkbox("reachpei", true) }}北
 				</div>
 
 				<table class="table table-bordered mb-4">

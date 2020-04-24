@@ -41,6 +41,14 @@ class InfoController extends Controller
         $myscore->score = 1;
         $myscore->dealer = false;
         $myscore->tsumo = false;
+        $myscore->reacha = false;
+        $myscore->reachb = false;
+        $myscore->reachc = false;
+        $myscore->reachd = false;
+        $myscore->nakia = 0;
+        $myscore->nakib = 0;
+        $myscore->nakic = 0;
+        $myscore->nakid = 0;
         $myscore->save();
 
         //空データ対策

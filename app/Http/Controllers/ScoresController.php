@@ -69,6 +69,25 @@ class ScoresController extends Controller
         }
     }
 
+    public function reach($myscore, $num) {
+        switch ((((int)($myscore->turn/100)) + $num) % 4) {
+            case 0:
+                $myscore->reacha = true;
+                break;
+            case 1:
+                $myscore->reachb = true;
+                break;
+            case 2:
+                $myscore->reachc = true;
+                break;
+            case 3:
+                $myscore->reachd = true;
+                break;
+        }
+
+        return $myscore;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -197,20 +216,56 @@ class ScoresController extends Controller
                         $myscore->houjuu_player = 5 + $tenpaicount;
                         $myscore->score = 0;
                         $myscore->tsumo = false;
+
+                        $turn = $myscore->turn + 1;
+                        //$request->0とは書けないので代用
                         $num = 0;
                         if (($request->$num) != NULL) {
                             $myscore->dealer = true;
                         } else {
                             $myscore->dealer = false;
+                            $turn += 100;
                         }
                     }
 
+                    //リーチ者
+                    $myscore->reacha = false;
+                    $myscore->reachb = false;
+                    $myscore->reachc = false;
+                    $myscore->reachd = false;
+                    $forreach = -99;
+                    if ($request->reachton == true) {
+                        $forreach = 0;
+                        $myscore = $this->reach($myscore, $forreach);
+                    }
+                    if ($request->reachnan == true) {
+                        $forreach = 1;
+                        $myscore = $this->reach($myscore, $forreach);
+                    }
+                    if ($request->reachsha == true) {
+                        $forreach = 2;
+                        $myscore = $this->reach($myscore, $forreach);
+                    }
+                    if ($request->reachpei == true) {
+                        $forreach = 3;
+                        $myscore = $this->reach($myscore, $forreach);
+                    }
+
+                    //鳴き
+                    $myscore->nakia = false;
+                    $myscore->nakib = false;
+                    $myscore->nakic = false;
+                    $myscore->nakid = false;
+
                     $myscore->save();
 
-                    if ($myscore->dealer == true) {
-                        $turn = $myscore->turn + 1;
+                    if ($request->ryuukyoku = "流局") {
                     } else {
-                        $turn = ((int)($myscore->turn/100)+1) * 100;
+                        if ($myscore->dealer == true) {
+                            $turn = $myscore->turn + 1;
+                        } else {
+                            $turn = ((int)($myscore->turn/100)+1) * 100;
+                        }
                     }
                 }
             }
