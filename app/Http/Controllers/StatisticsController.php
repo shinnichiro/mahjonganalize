@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Myscore;
+use App\Scores\ScoresOperation;
 
 class StatisticsController extends Controller
 {
@@ -17,10 +18,21 @@ class StatisticsController extends Controller
         $this->iscored++;
     }
 
+    private function ryaku() {
+        return Myscore::where("user_id", \Auth::id())->whereColumn("start", "player");
+    }
+
+    private function gentenryaku() {
+        return Myscore::where("user_id", \Auth::id())->whereColumn("start", "houjuu_player");
+    }
+
     public function statistics() {
+        $scoresoperation = new ScoresOperation();
+
         //空データ対策
         $latestscore = Myscore::where("user_id", \Auth::id())->latest()->first();
-        if ($latestscore->score == 1) {
+        if ($latestscore== NULL) {
+        } else if ($latestscore->score == 1) {
             $latestscore->delete();
         }
 
@@ -28,6 +40,20 @@ class StatisticsController extends Controller
         $allscores = $basicscores->get();
         $myscores = Myscore::where("user_id", \Auth::id())->whereColumn("start","player")->get();
         $houjuuscores = Myscore::where("user_id", \Auth::id())->whereColumn("start", "houjuu_player")->get();
+        $agari3900over = Myscore::where("user_id", \Auth::id())->whereColumn("start", "player")->where("score", ">=", "3900")->get();
+        $agari7700over = Myscore::where("user_id", \Auth::id())->whereColumn("start", "player")->where("score", ">=", "7700")->get();
+        $agari11600over = Myscore::where("user_id", \Auth::id())->whereColumn("start", "player")->where("score", ">=", "11600")->get();
+        $agaridealer = Myscore::where("user_id", \Auth::id())->whereColumn("start", "player")->where("score", ">", "10")->where("dealer", true)->get();
+        $tsumoagari = $this->ryaku()->where("score", ">", "0")->where("tsumo", true)->get();
+        $houjuu3900over = $this->gentenryaku()->where("score", ">=", "3900")->get();
+        $houjuu7700over = $this->gentenryaku()->where("score", ">=", "7700")->get();
+        $houjuu11600over = $this->gentenryaku()->where("score", ">=", "11600")->get();
+        $houjuutodealer = $this->gentenryaku()->where("score", ">", "10")->where("dealer", true)->get();
+        $houjuuwhendealers = $this->gentenryaku()->where("score", ">", "10")->get();
+        $houjuuwd = 0;
+        $ryuu = Myscore::where("user_id", \Auth::id())->where("houjuu_player", ">=", "5")->where("houjuu_player", "<=", "20")->get();
+        $counttenpai = 0;
+        $ryuushuushi = 0;
 
         foreach ($allscores as $allscore) {
             $this->allscored++;
@@ -37,24 +63,71 @@ class StatisticsController extends Controller
             $this->add($myscore->score);
         }
 
-        //0で割る対策
-        if ($this->iscored == 0){
-            $this->iscored = 1;
+
+        //データがない状態の対応
+        if (($this->iscored == 0) && ($this->allscored == 0)) {
+            $agaripro = 0;
+        } else {
+            $agaripro = ($this->iscored / $this->allscored) * 100;
         }
+        //0で割る対策
         if ($this->allscored == 0) {
             $this->allscored = 1;
+        }
+        if ($this->iscored == 0){
+            $this->iscored = 1;
         }
         if ($houjuuscores->count() == 0) {
             $houjuu = 1;
         } else {
             $houjuu = $houjuuscores->count();
         }
+        if ($ryuu->count() == 0) {
+            $ryuucount = 1;
+        } else {
+            $ryuucount = $ryuu->count();
+        }
+
+        foreach ($houjuuwhendealers as $houjuuwhendealer) {
+            if ($houjuuwhendealer->start == (int)($houjuuwhendealer->turn/100)%4) {
+                $houjuuwd++;
+            }
+        }
+
+        foreach ($ryuu as $ryu) {
+            if ($scoresoperation->ryuukyoku($ryu->start, $ryu->houjuu_player, $ryu->turn, false) == true) {
+                $counttenpai++;
+            }
+        }
+
+        foreach ($ryuu as $ryu) {
+            $tempstr = $scoresoperation->ryuukyoku($ryu->start, $ryu->houjuu_player, $ryu->turn, true);
+            if ($tempstr > 0) {
+            } else {
+                $tempstr = strstr($tempstr, "-");
+                $tempstr = strstr($tempstr, "<", true);
+            }
+            $ryuushuushi += (int)$tempstr;
+        }
 
         return view("statistics", [
-            "average" => $this->sum/$this->iscored,
-            "agaripro" => ($this->iscored/$this->allscored)*100,
-            "averagehoujuu" => $houjuuscores->sum("score")/$houjuu,
-            "houjuupro" => ($houjuuscores->count()/$this->allscored)*100,
+            "average" => round($this->sum/$this->iscored, 2),
+            "agaripro" => round($agaripro, 2),
+            "averagehoujuu" => round($houjuuscores->sum("score")/$houjuu, 2),
+            "houjuupro" => round(($houjuuscores->count()/$this->allscored)*100, 2),
+            "p3900over" => round(($agari3900over->count()/$this->iscored)*100, 2),
+            "p7700over" => round(($agari7700over->count()/$this->iscored)*100, 2),
+            "p11600over" => round(($agari11600over->count()/$this->iscored)*100, 2),
+            "agaridealer" => round(($agaridealer->count()/$this->iscored)*100, 2),
+            "tsumoagari" => round(($tsumoagari->count()/$this->iscored)*100, 2),
+            "m3900over" => round(($houjuu3900over->count()/$houjuu)*100, 2),
+            "m7700over" => round(($houjuu7700over->count()/$houjuu)*100, 2),
+            "m11600over" => round(($houjuu11600over->count()/$houjuu)*100, 2),
+            "houjuutodealer" => round(($houjuutodealer->count()/$houjuu)*100, 2),
+            "houjuuwd" => round(($houjuuwd/$houjuu)*100, 2),
+            "ryuukyoku" => round(($ryuu->count()/$this->allscored)*100, 2),
+            "tenpai" => round(($counttenpai/$ryuucount)*100, 2),
+            "ryuushuushi" => round(($ryuushuushi/$ryuucount), 2),
         ]);
     }
 }

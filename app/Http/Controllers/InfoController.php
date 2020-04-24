@@ -23,11 +23,14 @@ class InfoController extends Controller
         if (count($myscores) == 0) {
             $myscore->gamesOfDay = 0;
         } else {
-            //
-            if ($compscore->date != (date("Y-m-d"))) {
+            if ($compscore == NULL) {
                 $myscore->gamesOfDay = 0;
             } else {
-                $myscore->gamesOfDay = $compscore->gamesOfDay + 1;
+                if ($compscore->date != (date("Y-m-d"))) {
+                    $myscore->gamesOfDay = 0;
+                } else {
+                    $myscore->gamesOfDay = $compscore->gamesOfDay + 1;
+                }
             }
         }
 
@@ -41,8 +44,11 @@ class InfoController extends Controller
         $myscore->save();
 
         //空データ対策
-        if ($compscore->score == 1) {
-            $compscore->delete();
+        if ($compscore == NULL) {
+        } else {
+            if ($compscore->score == 1) {
+                $compscore->delete();
+            }
         }
 
         return redirect()->route("scores.index", [
