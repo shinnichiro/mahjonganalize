@@ -5,7 +5,7 @@
 	<p class="mb-5">統計用ページ（要ログイン／ログアウト時の振り分け）</p>
 
 	<div class="container">
-		<div class="row">
+		<div class="row mb-3">
 			<div class="col-md-3">
 				<table class="table table-bordered">
 					<thead>
@@ -20,7 +20,7 @@
 							<td>{{ $average }}点</td>
 						</tr>
 						<tr>
-							<td>ツモ和了率</td>
+							<td>ツモ和了</td>
 							<td>{{ $tsumoagari }}%</td>
 						</tr>
 						<tr>
@@ -36,7 +36,7 @@
 							<td>{{ $p11600over }}%</td>
 						</tr>
 						<tr>
-							<td>和了時親率</td>
+							<td>和了時親</td>
 							<td>{{ $agaridealer }}%</td>
 						</tr>
 					</tbody>
@@ -73,7 +73,7 @@
 							<td>{{ $houjuutodealer }}%</td>
 						</tr>
 						<tr>
-							<td>放銃時親率</td>
+							<td>放銃時親</td>
 							<td>{{ $houjuuwd }}%</td>
 						</tr>
 					</tbody>
@@ -101,8 +101,11 @@
 				</table>
 			</div>
 		</div>
+
+		<div class="d-flex justify-content-end">
+			{!! link_to_route("info.index", "新規入力", [], ["class" => "btn btn-success"]) !!}
+		</div>
 	</div>
 
-	{!! link_to_route("info.index", "入力ページへ（仮）") !!}
 
 @endsection
