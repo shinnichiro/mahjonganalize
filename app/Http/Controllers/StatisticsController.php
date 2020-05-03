@@ -26,6 +26,32 @@ class StatisticsController extends Controller
         return Myscore::where("user_id", \Auth::id())->whereColumn("start", "houjuu_player");
     }
 
+    private function countReach($myscore, $num) {
+        switch ($myscore->start) {
+            case 0:
+                if ($myscore->reacha == true) {
+                    return $num+1;
+                }
+                break;
+            case 1:
+                if ($myscore->reachb == true) {
+                    return $num+1;
+                }
+                break;
+            case 2:
+                if ($myscore->reachc == true) {
+                    return $num+1;
+                }
+                break;
+            case 3:
+                if ($myscore->reachd == true) {
+                    return $num+1;
+                }
+                break;
+        }
+        return $num;
+    }
+
     public function statistics() {
         $scoresoperation = new ScoresOperation();
 
@@ -54,9 +80,12 @@ class StatisticsController extends Controller
         $ryuu = Myscore::where("user_id", \Auth::id())->where("houjuu_player", ">=", "5")->where("houjuu_player", "<=", "20")->get();
         $counttenpai = 0;
         $ryuushuushi = 0;
+        $agarirs = $this->ryaku()->get();
+        $allreach = 0;
 
         foreach ($allscores as $allscore) {
             $this->allscored++;
+            $allreach = $this->countReach($allscore, $allreach);
         }
 
         foreach ($myscores as $myscore) {
@@ -87,6 +116,10 @@ class StatisticsController extends Controller
         } else {
             $ryuucount = $ryuu->count();
         }
+        if ($allreach == 0) {
+            $allreach = 1;
+        } else {
+        }
 
         foreach ($houjuuwhendealers as $houjuuwhendealer) {
             if ($houjuuwhendealer->start == (int)($houjuuwhendealer->turn/100)%4) {
@@ -110,6 +143,45 @@ class StatisticsController extends Controller
             $ryuushuushi += (int)$tempstr;
         }
 
+        //あがったときリーチ
+        $agarireach = 0;
+        foreach ($agarirs as $agarir) {
+            $agarireach = $this->countReach($agarir, $agarireach);
+        }
+
+        //放銃したときリーチ
+        //リーチへの放銃
+        $houjuureach = 0;
+        $houjuutoreach = 0;
+        foreach ($houjuuscores as $houjuun) {
+            $houjuureach = $this->countReach($houjuun, $houjuureach);
+            switch ($houjuun->player) {
+                case 0:
+                    if ($houjuun->reacha == true) {
+                        $houjuutoreach++;
+                    }
+                    break;
+                case 1:
+                    if ($houjuun->reachb == true) {
+                        $houjuutoreach++;
+                    }
+                    break;
+                case 2:
+                    if ($houjuun->reachc == true) {
+                        $houjuutoreach++;
+                    }
+                    break;
+                case 3:
+                    if ($houjuun->reachd == true) {
+                        $houjuutoreach++;
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+
+
         return view("statistics", [
             "average" => round($this->sum/$this->iscored, 2),
             "agaripro" => round($agaripro, 2),
@@ -128,6 +200,10 @@ class StatisticsController extends Controller
             "ryuukyoku" => round(($ryuu->count()/$this->allscored)*100, 2),
             "tenpai" => round(($counttenpai/$ryuucount)*100, 2),
             "ryuushuushi" => round(($ryuushuushi/$ryuucount), 2),
+            "agarireach" => round(($agarireach/$this->iscored)*100, 2),
+            "reachsuccess" => round(($agarireach/$allreach)*100, 2),
+            "houjuureach" => round(($houjuureach/$houjuu)*100, 2),
+            "houjuutoreach" =>round(($houjuutoreach/$houjuu)*100, 2),
         ]);
     }
 }

@@ -24,6 +24,10 @@
 							<td>{{ $tsumoagari }}%</td>
 						</tr>
 						<tr>
+							<td>リーチ成功率</td>
+							<td>{{ $reachsuccess }}%</td>
+						</tr>
+						<tr>
 							<td>和了時3900以上</td>
 							<td>{{ $p3900over }}%</td>
 						</tr>
@@ -38,6 +42,10 @@
 						<tr>
 							<td>和了時親</td>
 							<td>{{ $agaridealer }}%</td>
+						</tr>
+						<tr>
+							<td>和了時リーチ</td>
+							<td>{{ $agarireach }}%</td>
 						</tr>
 					</tbody>
 				</table>
@@ -73,8 +81,16 @@
 							<td>{{ $houjuutodealer }}%</td>
 						</tr>
 						<tr>
+							<td>リーチへの放銃</td>
+							<td>{{ $houjuutoreach }}%</td>
+						</tr>
+						<tr>
 							<td>放銃時親</td>
 							<td>{{ $houjuuwd }}%</td>
+						</tr>
+						<tr>
+							<td>放銃時リーチ</td>
+							<td>{{ $houjuureach }}%</td>
 						</tr>
 					</tbody>
 				</table>

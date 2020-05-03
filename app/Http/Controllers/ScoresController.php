@@ -226,6 +226,12 @@ class ScoresController extends Controller
                             $myscore->dealer = false;
                             $turn += 100;
                         }
+                    } else {
+                        if ($myscore->dealer == true) {
+                            $turn = $myscore->turn + 1;
+                        } else {
+                            $turn = ((int)($myscore->turn/100)+1) * 100;
+                        }
                     }
 
                     //リーチ者
@@ -258,15 +264,6 @@ class ScoresController extends Controller
                     $myscore->nakid = false;
 
                     $myscore->save();
-
-                    if ($request->ryuukyoku = "流局") {
-                    } else {
-                        if ($myscore->dealer == true) {
-                            $turn = $myscore->turn + 1;
-                        } else {
-                            $turn = ((int)($myscore->turn/100)+1) * 100;
-                        }
-                    }
                 }
             }
         }
