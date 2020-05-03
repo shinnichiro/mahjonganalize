@@ -1,11 +1,11 @@
 @extends("layouts.app")
 
 @section("content")
-
-	<p class="mb-5">統計用ページ（要ログイン／ログアウト時の振り分け）</p>
-
 	@auth
 	<div class="container">
+		<div class="mb-3">
+			<h2>統計用ページ</h2>
+		</div>
 		<div class="row mb-3">
 			<div class="col-md-3">
 				<table class="table table-bordered">
