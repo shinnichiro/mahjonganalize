@@ -12,32 +12,49 @@
 </head>
 <body>
 	<nav class="navbar navbar-expand-md navbar-dark bg-info mb-4">
+		<button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#nav-bar">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+
 		<a class="navbar-brand" href="#" >手動解析機</a>
 
-		<ul class="navbar-nav ml-auto">
-			@guest
-				<li class="nav-item">
-					{!! Form::open(["route" => "login", "method" => "get", "class" => "nav-link"]) !!}
-						{!! Form::submit("ログイン", ["class" => "btn btn-info"]) !!}
-					{!! Form::close() !!}
-				</li>
-				<li class="nav-item">
-					{!! Form::open(["route" => "register", "method" => "get", "class" => "nav-link"]) !!}
-						{!! Form::submit("登録", ["class" => "btn btn-info"]) !!}
-					{!! Form::close() !!}
-				</li>
-			@else
-				<li class="nav-item">
-					{!! Form::open(["route" => "statistics", "method" => "get", "class" => "nav-link"]) !!}
-						{!! Form::submit("統計ページ", ["class" => "btn btn-info"]) !!}
-					{!! Form::close() !!}
-				<li class="nav-item">
-					{!! Form::open(["route" => "logout", "method" => "post", "class" => "nav-link"]) !!}
-						{!! Form::submit("ログアウト", ["class" => "btn btn-info"]) !!}
-					{!! Form::close() !!}
-				</li>
-			@endguest
-		</ul>
+		<div class="collapse navbar-collapse" id="nav-bar">
+			<ul class="navbar-nav ml-auto">
+				@guest
+					<li class="nav-item">
+						{{ Form::open(["route" => "howto", "method" => "get", "class" => "nav-link", "target" => "_blank"]) }}
+							{{ Form::submit("使い方", ["class" => "btn btn-info"]) }}
+						{{ Form::close() }}
+					</li>
+					<li class="nav-item">
+						{{ Form::open(["route" => "login", "method" => "get", "class" => "nav-link"]) }}
+							{{ Form::submit("ログイン", ["class" => "btn btn-info"]) }}
+						{{ Form::close() }}
+					</li>
+					<li class="nav-item">
+						{{ Form::open(["route" => "register", "method" => "get", "class" => "nav-link"]) }}
+							{{ Form::submit("登録", ["class" => "btn btn-info"]) }}
+						{{ Form::close() }}
+					</li>
+				@else
+					<li class="nav-item">
+						{{ Form::open(["route" => "howto", "method" => "get", "class" => "nav-link", "target" => "_blank"]) }}
+							{{ Form::submit("使い方", ["class" => "btn btn-info"]) }}
+						{{ Form::close() }}
+					</li>
+					<li class="nav-item">
+						{{ Form::open(["route" => "statistics", "method" => "get", "class" => "nav-link"]) }}
+							{{ Form::submit("統計ページ", ["class" => "btn btn-info"]) }}
+						{{ Form::close() }}
+					</li>
+					<li class="nav-item">
+						{{ Form::open(["route" => "logout", "method" => "post", "class" => "nav-link"]) }}
+							{{ Form::submit("ログアウト", ["class" => "btn btn-info"]) }}
+						{{ Form::close() }}
+					</li>
+				@endguest
+			</ul>
+		</div>
 	</nav>
 
 	@yield("content")

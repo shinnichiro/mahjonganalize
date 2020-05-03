@@ -4,6 +4,7 @@
 
 	<p class="mb-5">統計用ページ（要ログイン／ログアウト時の振り分け）</p>
 
+	@auth
 	<div class="container">
 		<div class="row mb-3">
 			<div class="col-md-3">
@@ -122,6 +123,11 @@
 			{!! link_to_route("info.index", "新規入力", [], ["class" => "btn btn-success"]) !!}
 		</div>
 	</div>
-
+	@else
+	<?php
+	   header("Location: ./");
+	   exit;
+	?>
+	@endauth
 
 @endsection

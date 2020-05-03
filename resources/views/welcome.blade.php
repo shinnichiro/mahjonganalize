@@ -10,12 +10,15 @@
 			<div class="d-flex justify-content-around">
 				<h4>{!! link_to_route("login", "ログイン") !!}</h4>
 				<h4>{!! link_to_route("register", "登録") !!}</h4>
-				<h4>{!! link_to_route("howto", "What's this?") !!}</h4>
+				<h4>{!! link_to_route("howto", "What's this?", [], ["target" => "_blank"]) !!}</h4>
 			</div>
 		</div>
 	@else
 		<div class="text-center">
-			<a href="statistics">統計ページへ（リダイレクトにしたい）</a>
+			<?php
+			     header("Location: ./statistics");
+			     exit;
+			?>
 		</div>
 	@endguest
 

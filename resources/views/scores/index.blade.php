@@ -295,6 +295,7 @@ function displayPlayer($check, $player, $h_player, $score, $turn, $dealer) {
 
 @section("content")
 
+	@auth
 	<div class="container">
 		<div class="row">
 			<div class="col-md-6">
@@ -333,7 +334,8 @@ function displayPlayer($check, $player, $h_player, $score, $turn, $dealer) {
 				</div>
 
 				<div class="mb-3">
-					リーチ者　{{ Form::checkbox("reachton", true) }}東　{{ Form::checkbox("reachnan", true) }}南　{{ Form::checkbox("reachsha", true) }}西　{{ Form::checkbox("reachpei", true) }}北
+					リーチ者　{{ Form::checkbox("reachton", true) }}東　{{ Form::checkbox("reachnan", true) }}南　{{ Form::checkbox("reachsha", true) }}西　{{ Form::checkbox("reachpei", true) }}北　
+					{{ Form::checkbox("manyron", true) }} ダブロン／トリロン
 				</div>
 
 				<table class="table table-bordered mb-4">
@@ -370,7 +372,7 @@ function displayPlayer($check, $player, $h_player, $score, $turn, $dealer) {
 
 				{{ Form::close() }}
 
-				<div class="d-flex justify-content-end">
+				<div class="d-flex justify-content-end mb-4">
 					{{ link_to_route("info.index", "続けて入力", [], ["class" => "btn btn-primary"]) }}　
 					{{ link_to_route("statistics", "統計ページへ", [], ["class" => "btn btn-success"]) }}
 				</div>
@@ -412,5 +414,11 @@ function displayPlayer($check, $player, $h_player, $score, $turn, $dealer) {
 			</div>
 		</div>
 	</div>
+	@else
+		<?php
+            header("Location: ./");
+            exit;
+		?>
+	@endauth
 
 @endsection

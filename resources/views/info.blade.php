@@ -2,6 +2,7 @@
 
 @section("content")
 
+	@auth
 	<div style="text-align: center">
 	{!! Form::open(["route" => "info.store"]) !!}
 		<p><h1>最初の席？</h1></p>
@@ -9,5 +10,11 @@
 		{!! Form::submit("開始") !!}
 	{!! Form::close() !!}
 	</div>
+	@else
+		<?php
+	       header("Location: ./");
+	       exit;
+		?>
+	@endauth
 
 @endsection

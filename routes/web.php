@@ -22,4 +22,6 @@ Route::get("statistics", "StatisticsController@statistics")->name("statistics");
 
 Route::resource("info", "InfoController", ["only" => ["index", "store"]]);
 
-Route::resource("scores", "ScoresController");
+Route::group(["middleware" => ["auth"]], function() {
+    Route::resource("scores", "ScoresController");
+});

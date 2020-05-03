@@ -164,25 +164,29 @@ class ScoresController extends Controller
                 //東家で子の点数を選ぶorその逆だったとき
                 if ((!((($request->player == "0") && ($request->dealer == "false")) || (($request->player != "0") && ($request->dealer == "true")))) || ($flag == 1)) {
                     $myscore = new Myscore;
-                    $compscore = Myscore::where("user_id", \Auth::id())->latest()->first();
+                    $latestscore = Myscore::where("user_id", \Auth::id())->latest()->first();
 
-                    $myscore->date = date("Y-m-d");
+                    $myscore->date = $latestscore->date;
 
                     //初期値判定
-                    if ($compscore->score == 1) {
-                        $myscore = $compscore;
+                    if ($latestscore->score == 1) {
+                        $myscore = $latestscore;
                     } else {
-                        $myscore->start = $compscore->start;
-                        $myscore->gamesOfDay = $compscore->gamesOfDay;
+                        $myscore->start = $latestscore->start;
+                        $myscore->gamesOfDay = $latestscore->gamesOfDay;
                     }
 
-                    //すでに入力済みの局だったとき
+                    //すでに入力済みの局だったとき（ただしダブロンを除く）
                     $inputedscores = Myscore::where("user_id", \Auth::id())->where("date", $myscore->date)->where("gamesOfDay", $myscore->gamesOfDay)->get();
                     foreach($inputedscores as $inputedscore) {
-                        if ($inputedscore->turn == $request->turn) {
-                            return redirect()->route("scores.index", [
-                                "turn" => $request->turn,
-                            ]);
+                        if ($request->manyron == true) {
+                            break;
+                        } else {
+                            if ($inputedscore->turn == $request->turn) {
+                                return redirect()->route("scores.index", [
+                                    "turn" => $request->turn,
+                                ]);
+                            }
                         }
                     }
 
@@ -320,7 +324,37 @@ class ScoresController extends Controller
     public function destroy($id)
     {
         $myscore = Myscore::find($id);
+
+        $latestscore = Myscore::where("user_id", \Auth::id())->latest()->first();
+        $latestscore2 = Myscore::where("user_id", \Auth::id())->where("id", "<", $latestscore->id)->latest()->first();
+
+        //削除
         $myscore->delete();
+
+        //全削除時、前局のデータに戻ってしまう対策
+        if (!(($latestscore->gamesOfDay == $latestscore2->gamesOfDay) && ($latestscore->date == $latestscore2->date))) {
+            $myscore = new Myscore;
+
+            $myscore->user_id = \Auth::id();
+            $myscore->player = 5;
+            $myscore->houjuu_player = 99;
+            $myscore->date = $latestscore->date;
+            $myscore->gamesOfDay = $latestscore->gamesOfDay;
+            $myscore->start = $latestscore->start;
+            $myscore->turn = 10000;
+            $myscore->score = 1;
+            $myscore->dealer = false;
+            $myscore->tsumo = false;
+            $myscore->reacha = false;
+            $myscore->reachb = false;
+            $myscore->reachc = false;
+            $myscore->reachd = false;
+            $myscore->nakia = 0;
+            $myscore->nakib = 0;
+            $myscore->nakic = 0;
+            $myscore->nakid = 0;
+            $myscore->save();
+        }
 
         return redirect("scores");
     }
