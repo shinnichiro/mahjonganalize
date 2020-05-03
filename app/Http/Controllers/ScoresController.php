@@ -103,19 +103,23 @@ class ScoresController extends Controller
             $this->dealer = false;
         }
 
-        //東１局で-を押した
-        if ($request->turn < 0) {
-            $turn = 0;
-        //実装は西４局まで
-        } else if ($request->turn > 1100) {
-            $turn = 1100 + ($request->turn)%100;
-        //0本場で-を押した
-        } else if ($request->turn % 100 == 99) {
-            $turn = $request->turn + 1;
-        } else if ($request->turn == NULL) {
-            $turn = 0;
+        if (is_numeric($request->turn) == true) {
+            //東１局で-を押した
+            if ($request->turn < 0) {
+                $turn = 0;
+            //実装は西４局まで
+            } else if ($request->turn > 1100) {
+                $turn = 1100 + ($request->turn)%100;
+            //0本場で-を押した
+            } else if ($request->turn % 100 == 99) {
+                $turn = $request->turn + 1;
+            } else if ($request->turn == NULL) {
+                $turn = 0;
+            } else {
+                $turn = $request->turn;
+            }
         } else {
-            $turn = $request->turn;
+            $turn = 0;
         }
 
         return view("scores.index", [
