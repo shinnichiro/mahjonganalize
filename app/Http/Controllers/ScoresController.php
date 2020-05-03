@@ -323,6 +323,7 @@ class ScoresController extends Controller
      */
     public function destroy($id)
     {
+        $flag = 0;
         $myscore = Myscore::find($id);
 
         $latestscore = Myscore::where("user_id", \Auth::id())->latest()->first();
@@ -331,14 +332,27 @@ class ScoresController extends Controller
         //削除
         $myscore->delete();
 
-        //全削除時、前局のデータに戻ってしまう対策
-        if (!(($latestscore->gamesOfDay == $latestscore2->gamesOfDay) && ($latestscore->date == $latestscore2->date))) {
+        if (!(($latestscore == NULL) || ($latestscore2 == NULL))) {
+            //全削除時、前局のデータに戻ってしまう対策
+            if (!(($latestscore->gamesOfDay == $latestscore2->gamesOfDay) && ($latestscore->date == $latestscore2->date))) {
+                $flag = 1;
+            }
+        } else {
+            $flag = 1;
+        }
+
+        if ($flag == 1) {
             $myscore = new Myscore;
+
+            if ($latestscore->date != NULL) {
+                $myscore->date = $latestscore->date;
+            } else {
+                $myscore->date = date(Y-m-d);
+            }
 
             $myscore->user_id = \Auth::id();
             $myscore->player = 5;
             $myscore->houjuu_player = 99;
-            $myscore->date = $latestscore->date;
             $myscore->gamesOfDay = $latestscore->gamesOfDay;
             $myscore->start = $latestscore->start;
             $myscore->turn = 10000;
